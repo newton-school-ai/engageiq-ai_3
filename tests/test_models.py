@@ -32,9 +32,7 @@ def test_course_teacher_relationship():
             assert course.teacher_id == teacher.id
             print("✅ Relationship test passed")
 
-def test_unique_emailgit add .
-git commit -m "style: format code with black and isort"
-git push origin feature/issue-3-db-schema():
+def test_unique_email():
     with Session(engine) as db:
         with pytest.raises(Exception):
             u1 = User(name="A", email="same@test.com", role=UserRole.student, privacy_consent=True)
