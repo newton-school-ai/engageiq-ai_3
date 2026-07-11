@@ -34,8 +34,10 @@ jobs:
       #   run: black --check src/ tests/
       
 
+      # - name: Isort Check
+      #   run: isort --check src/ tests/
       - name: Isort Check
-        run: isort --check src/ tests/
+        run: isort --check --diff src/ tests/
 
       - name: Flake8 Check
         run: flake8 src/ tests/
