@@ -27,7 +27,6 @@ from starlette.testclient import WebSocketTestSession
 from src.api.main import app
 from src.api.websocket import ConnectionManager, FrameProcessor, manager
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -70,7 +69,9 @@ def reset_manager():
 
 def test_websocket_connection_and_ack(client: TestClient):
     """A client connecting to /ws/session/{id} should receive an ACK message."""
-    with client.websocket_connect("/ws/session/test-session?student_id=student-1") as ws:
+    with client.websocket_connect(
+        "/ws/session/test-session?student_id=student-1"
+    ) as ws:
         ack = ws.receive_json()
 
     assert ack["type"] == "ack"
@@ -81,9 +82,7 @@ def test_websocket_connection_and_ack(client: TestClient):
 
 def test_websocket_connection_registers_in_manager(client: TestClient):
     """Connecting should register the student in ConnectionManager."""
-    with client.websocket_connect(
-        "/ws/session/reg-session?student_id=alice"
-    ) as ws:
+    with client.websocket_connect("/ws/session/reg-session?student_id=alice") as ws:
         ws.receive_json()  # consume ACK
         assert manager.is_connected("reg-session", "alice")
 
@@ -98,9 +97,7 @@ def test_websocket_connection_registers_in_manager(client: TestClient):
 
 def test_websocket_frame_processing_returns_engagement(client: TestClient):
     """Sending a valid base64 frame should return an engagement score response."""
-    with client.websocket_connect(
-        "/ws/session/s1?student_id=bob"
-    ) as ws:
+    with client.websocket_connect("/ws/session/s1?student_id=bob") as ws:
         ws.receive_json()  # consume ACK
 
         ws.send_text(_frame_payload(timestamp=42.0))
@@ -117,9 +114,7 @@ def test_websocket_frame_processing_returns_engagement(client: TestClient):
 
 def test_websocket_frame_id_increments_per_frame(client: TestClient):
     """Each processed frame should increment the frame_id counter."""
-    with client.websocket_connect(
-        "/ws/session/s2?student_id=carol"
-    ) as ws:
+    with client.websocket_connect("/ws/session/s2?student_id=carol") as ws:
         ws.receive_json()  # consume ACK
 
         for expected_id in range(1, 4):
@@ -130,9 +125,7 @@ def test_websocket_frame_id_increments_per_frame(client: TestClient):
 
 def test_websocket_invalid_json_returns_error(client: TestClient):
     """Sending malformed JSON should return an error, not crash the connection."""
-    with client.websocket_connect(
-        "/ws/session/s3?student_id=dan"
-    ) as ws:
+    with client.websocket_connect("/ws/session/s3?student_id=dan") as ws:
         ws.receive_json()  # consume ACK
 
         ws.send_text("this is not json")
@@ -144,9 +137,7 @@ def test_websocket_invalid_json_returns_error(client: TestClient):
 
 def test_websocket_missing_frame_key_returns_error(client: TestClient):
     """Payload without a 'frame' key should return an error message."""
-    with client.websocket_connect(
-        "/ws/session/s4?student_id=eve"
-    ) as ws:
+    with client.websocket_connect("/ws/session/s4?student_id=eve") as ws:
         ws.receive_json()  # consume ACK
 
         ws.send_text(json.dumps({"timestamp": 1.0}))
@@ -163,9 +154,7 @@ def test_websocket_missing_frame_key_returns_error(client: TestClient):
 
 def test_websocket_disconnect_cleans_up(client: TestClient):
     """Disconnecting should remove the entry from ConnectionManager."""
-    with client.websocket_connect(
-        "/ws/session/d1?student_id=frank"
-    ) as ws:
+    with client.websocket_connect("/ws/session/d1?student_id=frank") as ws:
         ws.receive_json()  # consume ACK
         assert manager.is_connected("d1", "frank")
 
@@ -176,14 +165,10 @@ def test_websocket_disconnect_cleans_up(client: TestClient):
 
 def test_websocket_disconnect_does_not_affect_other_students(client: TestClient):
     """Disconnecting one student should leave other students' connections intact."""
-    with client.websocket_connect(
-        "/ws/session/group?student_id=grace"
-    ) as ws_grace:
+    with client.websocket_connect("/ws/session/group?student_id=grace") as ws_grace:
         ws_grace.receive_json()  # consume ACK
 
-        with client.websocket_connect(
-            "/ws/session/group?student_id=hank"
-        ) as ws_hank:
+        with client.websocket_connect("/ws/session/group?student_id=hank") as ws_hank:
             ws_hank.receive_json()  # consume ACK
 
             # Both connected

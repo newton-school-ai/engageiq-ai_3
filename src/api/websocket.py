@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 # Connection Manager
 # ---------------------------------------------------------------------------
 
+
 class ConnectionManager:
     """Manages all active WebSocket connections, keyed by (session_id, student_id).
 
@@ -122,6 +123,7 @@ manager = ConnectionManager()
 # ---------------------------------------------------------------------------
 # Frame processor (one per connection, owns its own preprocessor)
 # ---------------------------------------------------------------------------
+
 
 class FrameProcessor:
     """Decodes a base64 frame, preprocesses it, and returns an engagement score.
@@ -229,7 +231,7 @@ class FrameProcessor:
         gaze_score = float(np.clip(frame.mean() * 100, 0, 100))
         pose_score = float(np.clip(frame.std() * 200, 0, 100))
         expression_score = 50.0  # neutral placeholder
-        alertness_score = 75.0   # awake placeholder
+        alertness_score = 75.0  # awake placeholder
 
         return compute_engagement_score(
             gaze_score=gaze_score,
@@ -254,10 +256,12 @@ class FrameProcessor:
 # Utility helpers
 # ---------------------------------------------------------------------------
 
+
 def _try_imdecode(buffer: np.ndarray) -> Optional[np.ndarray]:
     """Attempt OpenCV JPEG/PNG decode; return None if it fails."""
     try:
         import cv2  # local import to avoid hard dep in unit tests
+
         img = cv2.imdecode(buffer, cv2.IMREAD_COLOR)
         return img if img is not None else None
     except Exception:  # noqa: BLE001
@@ -279,13 +283,14 @@ def _infer_dimensions(n_pixels: int) -> tuple:
         if h * w == n_pixels:
             return h, w
     # Generic fallback: square-ish
-    side = int(n_pixels ** 0.5)
+    side = int(n_pixels**0.5)
     return side, side
 
 
 # ---------------------------------------------------------------------------
 # Authentication helper
 # ---------------------------------------------------------------------------
+
 
 def _authenticate_token(session_id: str, token: Optional[str]) -> bool:
     """Validate a session token.
@@ -301,7 +306,8 @@ def _authenticate_token(session_id: str, token: Optional[str]) -> bool:
     Returns:
         True if the connection should be allowed.
     """
-    from src.config.settings import settings  # deferred to avoid circular import
+    from src.config.settings import \
+        settings  # deferred to avoid circular import
 
     if settings.debug:
         # In debug mode, allow unauthenticated connections (e.g. local testing)
@@ -376,17 +382,13 @@ async def websocket_endpoint(
             try:
                 payload: Dict[str, Any] = json.loads(raw)
             except json.JSONDecodeError:
-                await websocket.send_json(
-                    {"type": "error", "message": "Invalid JSON"}
-                )
+                await websocket.send_json({"type": "error", "message": "Invalid JSON"})
                 continue
 
             try:
                 result = processor.process(payload)
             except ValueError as exc:
-                await websocket.send_json(
-                    {"type": "error", "message": str(exc)}
-                )
+                await websocket.send_json({"type": "error", "message": str(exc)})
                 continue
             except Exception as exc:  # noqa: BLE001
                 logger.exception(

@@ -141,7 +141,9 @@ class WebcamCapture:
             frames.append(frame)
         return frames
 
-    def stream(self, duration: Optional[float] = None) -> Generator[TimestampedFrame, None, None]:
+    def stream(
+        self, duration: Optional[float] = None
+    ) -> Generator[TimestampedFrame, None, None]:
         """
         A generator yielding frames at the regulated target FPS.
 
@@ -170,12 +172,21 @@ class WebcamCapture:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     parser = argparse.ArgumentParser(description="Webcam Capture CLI")
-    parser.add_argument("--source", type=str, default="0", help="Webcam index (int) or video file path (str)")
+    parser.add_argument(
+        "--source",
+        type=str,
+        default="0",
+        help="Webcam index (int) or video file path (str)",
+    )
     parser.add_argument("--fps", type=int, default=15, help="Target FPS")
-    parser.add_argument("--duration", type=float, default=5.0, help="Duration to run in seconds")
+    parser.add_argument(
+        "--duration", type=float, default=5.0, help="Duration to run in seconds"
+    )
     args = parser.parse_args()
 
     # Determine if source is an integer index
@@ -189,7 +200,9 @@ if __name__ == "__main__":
         print(f"Error initializing WebcamCapture: {e}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"WebcamCapture started. Source: {source_val}, Target FPS: {args.fps}, Duration: {args.duration}s")
+    print(
+        f"WebcamCapture started. Source: {source_val}, Target FPS: {args.fps}, Duration: {args.duration}s"
+    )
     frames_count = 0
     start_time = None
 

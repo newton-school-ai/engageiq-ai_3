@@ -12,12 +12,21 @@ from src.pipeline.capture import TimestampedFrame, WebcamCapture
 __all__ = ["WebcamCapture", "TimestampedFrame"]
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     parser = argparse.ArgumentParser(description="Webcam Capture Ingestion CLI")
-    parser.add_argument("--source", type=str, default="0", help="Webcam index (int) or video file path (str)")
+    parser.add_argument(
+        "--source",
+        type=str,
+        default="0",
+        help="Webcam index (int) or video file path (str)",
+    )
     parser.add_argument("--fps", type=int, default=15, help="Target FPS")
-    parser.add_argument("--duration", type=float, default=10.0, help="Duration to run in seconds")
+    parser.add_argument(
+        "--duration", type=float, default=10.0, help="Duration to run in seconds"
+    )
     args = parser.parse_args()
 
     # Determine if source is 'webcam' or digit or file path
@@ -33,7 +42,9 @@ if __name__ == "__main__":
         print(f"Error initializing WebcamCapture: {e}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"WebcamCapture Ingestion started. Source: {source_val}, Target FPS: {args.fps}, Duration: {args.duration}s")
+    print(
+        f"WebcamCapture Ingestion started. Source: {source_val}, Target FPS: {args.fps}, Duration: {args.duration}s"
+    )
     frames_count = 0
     start_time = None
 
