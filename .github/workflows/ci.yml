@@ -25,8 +25,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install black isort flake8 pytest
 
+      - name: Black Version
+        run: black --version
+
       - name: Black Check
-        run: black --check src/ tests/
+        run: black --check --diff src/ tests/
+      # - name: Black Check
+      #   run: black --check src/ tests/
+      
 
       - name: Isort Check
         run: isort --check src/ tests/
