@@ -306,7 +306,7 @@ def _authenticate_token(session_id: str, token: Optional[str]) -> bool:
     Returns:
         True if the connection should be allowed.
     """
-    from src.config.settings import settings  # deferred to avoid circular import
+    from src.config.settings import settings  # noqa: PLC0415   # deferred to avoid circular import
 
     if settings.debug:
         # In debug mode, allow unauthenticated connections (e.g. local testing)
